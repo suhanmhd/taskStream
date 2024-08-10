@@ -44,6 +44,30 @@ public class GlobalExceptionHandler {
                 ZonedDateTime.now()
         );
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UserNotFoundException.class)
+    public ApiErrorResponse handleUserNotFoundException(UserNotFoundException ex, HttpServletRequest request, HandlerMethod method) {
+        return new ApiErrorResponse(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                request.getRequestURI(),
+                method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ResourceCreationException.class)
+    public ApiErrorResponse handleResourceCreationException(ResourceCreationException ex, HttpServletRequest request, HandlerMethod method) {
+        return new ApiErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage(),
+                request.getRequestURI(),
+                method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(BadCredentialException.class)
     public ApiErrorResponse handleBadCredentialException(BadCredentialException ex, HttpServletRequest request, HandlerMethod method) {
@@ -55,6 +79,19 @@ public class GlobalExceptionHandler {
                 ZonedDateTime.now()
         );
     }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ApiErrorResponse handleUnauthorizedAccessException(UnauthorizedAccessException ex, HttpServletRequest request, HandlerMethod method) {
+        return new ApiErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage(),
+                request.getRequestURI(),
+                method.getMethod().getName(),
+                ZonedDateTime.now()
+        );
+    }
+
 
 
     @ResponseStatus(HttpStatus.CONFLICT)

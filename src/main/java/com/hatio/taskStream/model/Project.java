@@ -1,5 +1,6 @@
 package com.hatio.taskStream.model;
 
+import com.hatio.taskStream.auth.entities.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,9 +27,12 @@ public class Project {
     private String title;
     private LocalDateTime createdDate;
 
-
     @OneToMany(mappedBy="project",cascade=CascadeType.ALL)
     private List<Todo>todos = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
 
 }

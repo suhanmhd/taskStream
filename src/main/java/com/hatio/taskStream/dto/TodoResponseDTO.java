@@ -1,23 +1,22 @@
 package com.hatio.taskStream.dto;
 
+import com.hatio.taskStream.enums.TodoStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProjectDTO {
+public class TodoResponseDTO {
     private UUID id;
-    private String title;
+    private String description;
+    private TodoStatus status;
     private LocalDateTime createdDate;
-    private List<TodoDTO> todos;
-
-
+    private LocalDateTime updatedDate;
+    private  UUID projectId;
 }

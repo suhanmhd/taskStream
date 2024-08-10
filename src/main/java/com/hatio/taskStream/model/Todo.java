@@ -6,8 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 @Data
@@ -24,7 +27,13 @@ public class Todo {
     private String description;
     @Enumerated(EnumType.STRING)
     private TodoStatus status;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdDate;
+
+
+    @UpdateTimestamp
     private LocalDateTime updatedDate;
     @ManyToOne
     @JoinColumn(name="project_id",nullable = false)
