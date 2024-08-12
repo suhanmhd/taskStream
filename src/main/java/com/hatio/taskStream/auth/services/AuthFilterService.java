@@ -91,13 +91,16 @@ public class AuthFilterService extends OncePerRequestFilter {
         String jwt;
         String username;
 
-//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 //            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 //            response.setContentType("application/json");
 //            response.getWriter().write("{\"error\": \"Unauthorized - Authentication token is missing or invalid.\"}");
 //            response.getWriter().flush();
-//            return;
-//        }
+
+            filterChain.doFilter(request, response);
+
+            return;
+        }
 
         jwt = authHeader.substring(7);
 
