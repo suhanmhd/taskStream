@@ -92,10 +92,10 @@ public class AuthFilterService extends OncePerRequestFilter {
         String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.setContentType("application/json");
-//            response.getWriter().write("{\"error\": \"Unauthorized - Authentication token is missing or invalid.\"}");
-//            response.getWriter().flush();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized - Authentication token is missing or invalid.\"}");
+            response.getWriter().flush();
 
             filterChain.doFilter(request, response);
 
@@ -104,7 +104,7 @@ public class AuthFilterService extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
 
-//        try {
+        try {
             username = jwtService.extractUsername(jwt);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -126,14 +126,14 @@ public class AuthFilterService extends OncePerRequestFilter {
             }
 
 
-//        } catch (Exception e) {
-//
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.setContentType("application/json");
-//            response.getWriter().write("{\"error\": \"Unauthorized - Authentication failed.\"}");
-//            response.getWriter().flush();
-//            return;
-//        }
+        } catch (Exception e) {
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized - Authentication failed.\"}");
+            response.getWriter().flush();
+            return;
+        }
 
         filterChain.doFilter(request, response);
     }
