@@ -118,6 +118,7 @@
 			</plugin>
 
 		</plugins>
+		<finalName>task-stream</finalName>
 	</build>
 
 </project>

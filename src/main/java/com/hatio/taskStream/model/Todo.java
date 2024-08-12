@@ -26,6 +26,7 @@ public class Todo {
     private UUID id;
     private String description;
     @Enumerated(EnumType.STRING)
+    @Column(length = 25)
     private TodoStatus status;
 
     @CreationTimestamp

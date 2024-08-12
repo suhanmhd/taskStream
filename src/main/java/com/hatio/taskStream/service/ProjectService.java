@@ -16,4 +16,8 @@ public interface ProjectService {
     ProjectResponseDTO updateProjectById(UUID id, ProjectRequestDTO projectRequestDTO, String username);
 
     void deleteProjectById(UUID id, String username);
+
+    void saveGitHubToken(String username, String token);
+
+    String exportProjectSummaryAsGist(UUID projectId);
 }

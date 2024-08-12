@@ -5,41 +5,51 @@ import com.hatio.taskStream.auth.repositories.UserRepository;
 import com.hatio.taskStream.auth.services.JwtService;
 import com.hatio.taskStream.dto.ProjectRequestDTO;
 import com.hatio.taskStream.dto.ProjectResponseDTO;
-import com.hatio.taskStream.dto.TodoResponseDTO;
+import com.hatio.taskStream.enums.TodoStatus;
 import com.hatio.taskStream.exception.ResourceCreationException;
 import com.hatio.taskStream.exception.ResourceNotFoundException;
 import com.hatio.taskStream.exception.UnauthorizedAccessException;
-import com.hatio.taskStream.exception.UserNotFoundException;
 import com.hatio.taskStream.model.Project;
 
 import com.hatio.taskStream.repository.ProjectRepository;
+import com.hatio.taskStream.service.GitHubGistService;
+import com.hatio.taskStream.service.MarkdownService;
 import com.hatio.taskStream.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.*;
-
 
 @Service
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
+
     private final JwtService jwtService;
-    private  final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final ModelMapper modelMapper;
+    private final GitHubGistService gitHubGistService;
+    private final MarkdownService markdownService;
 
-    private  final ModelMapper modelMapper;
+    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+    @Value("${github.client-id}")
+    private String clientId;
 
+    @Value("${github.client-secret}")
+    private String clientSecret;
 
+    @Value("${github.redirect-uri}")
+    private String redirectUri;
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
     @Override
     public ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO, String authHeader) {
-
         logger.info("Creating project for request: {}", projectRequestDTO);
 
         String token = authHeader.substring(7);
@@ -82,24 +92,22 @@ public class ProjectServiceImpl implements ProjectService {
         logger.info("User found: {}", user.getUsername());
 
         List<Project> projects = projectRepository.findByUser(user);
-        logger.info("Found {} todos for project {}", projects.size(), user.getUsername());
+        logger.info("Found {} projects for user {}", projects.size(), user.getUsername());
 
         return projects.stream()
                 .map(this::mapToProjectResponseDTO)
                 .toList();
-
     }
 
     @Override
     public ProjectResponseDTO getProjectById(UUID id) {
-
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error("Project not found with ID: {}", id);
                     return new ResourceNotFoundException("Project not found with ID: " + id);
                 });
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!project.getUser().getUsername().equals(username)) {
             logger.error("User: {} is not authorized to access project with ID: {}", username, id);
             throw new UnauthorizedAccessException("You are not authorized to access this project.");
@@ -123,6 +131,7 @@ public class ProjectServiceImpl implements ProjectService {
             logger.error("User: {} is not authorized to update project with ID: {}", username, id);
             throw new UnauthorizedAccessException("You are not authorized to update this project.");
         }
+
         project.setTitle(projectRequestDTO.getTitle());
 
         Project updatedProject = projectRepository.save(project);
@@ -147,15 +156,55 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         projectRepository.delete(project);
-        logger.info("Project deleted successfully with ID: {}", id);
+        logger.info("Project with ID: {} deleted successfully.", id);
     }
 
+    @Override
+    public void saveGitHubToken(String username, String token) {
+        logger.info("Saving GitHub token for user: {}", username);
 
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> {
+                    logger.error("User not found with username: {}", username);
+                    return new ResourceNotFoundException("User not found with username: " + username);
+                });
+
+        user.setGithubToken(token);
+        userRepository.save(user);
+        logger.info("GitHub token saved successfully for user: {}", username);
+    }
+
+    @Override
+    public String exportProjectSummaryAsGist(UUID projectId) {
+        logger.info("Exporting project summary as gist for project ID: {}", projectId);
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> {
+                    logger.error("Project not found with ID: {}", projectId);
+                    return new ResourceNotFoundException("Project not found with ID: " + projectId);
+                });
+
+        String markdownSummary = markdownService.generateMarkdownSummary(project);
+        String gitToken = project.getUser().getGithubToken();
+        if (gitToken == null) {
+            logger.warn("GitHub token is missing for user with project ID: {}. Redirecting to authorization.", projectId);
+            return "REDIRECT:" + buildGitHubAuthorizationUrl();
+        }
+
+
+        String gistUrl = gitHubGistService.createSecretGist(project.getTitle(), markdownSummary,gitToken);
+
+        logger.info("Project summary exported as gist. URL: {}", gistUrl);
+        return gistUrl;
+    }
+
+    private String buildGitHubAuthorizationUrl() {
+        String state = SecurityContextHolder.getContext().getAuthentication().getName();
+        String authorizeUrl = "https://github.com/login/oauth/authorize?client_id=" + clientId +
+                "&redirect_uri=" + redirectUri + "&scope=gist&state=" + state;
+        return authorizeUrl;
+    }
     private ProjectResponseDTO mapToProjectResponseDTO(Project project) {
-        logger.debug("Mapping Project entity to ProjectResponseDTO for project ID: {}", project.getId());
         return modelMapper.map(project, ProjectResponseDTO.class);
     }
-
-
-
 }

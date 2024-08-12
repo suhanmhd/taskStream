@@ -11,6 +11,7 @@ import com.hatio.taskStream.model.Todo;
 import com.hatio.taskStream.repository.ProjectRepository;
 import com.hatio.taskStream.repository.TodoRepository;
 import com.hatio.taskStream.service.TodoService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -24,22 +25,23 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TodoServiceImpl implements TodoService {
-    private  final TodoRepository todoRepository;
-    private  final ProjectRepository projectRepository;
-    private  final ModelMapper modelMapper;
+
+    private final TodoRepository todoRepository;
+    private final ProjectRepository projectRepository;
+    private final ModelMapper modelMapper;
     private static final Logger logger = LoggerFactory.getLogger(TodoServiceImpl.class);
+
     @Override
-    public TodoResponseDTO addTodo(TodoRequestDTO todoRequestDTO) {
+    @Transactional
+    public TodoResponseDTO createTodo(TodoRequestDTO todoRequestDTO) {
         logger.info("Fetching Project with projectId: {}", todoRequestDTO.getProjectId());
-        Optional<Project> optionalProject = projectRepository.findById(todoRequestDTO.getProjectId());
 
-        if (optionalProject.isEmpty()) {
+        Project project = projectRepository.findById(todoRequestDTO.getProjectId())
+                .orElseThrow(() -> {
+                    logger.error("Project not found with ID: {}", todoRequestDTO.getProjectId());
+                    return new ResourceNotFoundException("Project not found with ID: "+ todoRequestDTO.getProjectId());
+                });
 
-            logger.error("Project not found with ID: {}", todoRequestDTO.getProjectId());
-            throw new ResourceNotFoundException("Project not found with id"+todoRequestDTO.getProjectId());
-        }
-
-        Project project = optionalProject.get();
         Todo todo = Todo.builder()
                 .description(todoRequestDTO.getDescription())
                 .status(todoRequestDTO.getStatus())
@@ -51,7 +53,7 @@ public class TodoServiceImpl implements TodoService {
             logger.info("Todo created successfully with ID: {}", savedTodo.getId());
             return mapToTodoResponseDTO(savedTodo);
         } catch (Exception e) {
-            logger.error("Error occurred while saving Todo: ",e);
+            logger.error("Error occurred while saving Todo: ", e);
             throw new ResourceCreationException("Failed to save the Todo.");
         }
     }
@@ -59,84 +61,87 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public List<TodoResponseDTO> getTodosByProject(UUID projectId, String username) {
         logger.info("Fetching Project with projectId: {}", projectId);
-        Optional<Project> optionalProject = projectRepository.findById(projectId);
 
-        if (optionalProject.isEmpty()) {
-            logger.error("Project not found with ID: {}", projectId);
-            throw new ResourceNotFoundException("Project not found with id"+projectId);
-        }
-        Project project = optionalProject.get();
-        if (!project.getUser().getUsername().equals(username)) {
-            logger.error("User: {} is not authorized to update project with ID: {}", username, projectId);
-            throw new UnauthorizedAccessException("You are not authorized to update this project.");
-        }
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> {
+                    logger.error("Project not found with ID: {}", projectId);
+                    return new ResourceNotFoundException(String.format("Project not found with ID: %s", projectId));
+                });
 
+        checkUserAuthorization(project, username);
 
         List<Todo> todos = todoRepository.findByProject(project);
         logger.info("Retrieved {} todos for project ID: {}", todos.size(), projectId);
-        return   todos.stream()
+
+        return todos.stream()
                 .map(this::mapToTodoResponseDTO)
                 .toList();
     }
 
     @Override
-    public TodoResponseDTO updateTodo(UUID todoId, UUID id, TodoRequestDTO todoRequestDTO, String username) {
+    @Transactional
+    public TodoResponseDTO updateTodo(UUID projectId, UUID todoId, TodoRequestDTO todoRequestDTO, String username) {
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> {
-                    logger.error("Todo not found with ID:{}", todoId);
-                    return new ResourceNotFoundException("Todo not found with ID: " + todoId);
+                    logger.error("Todo not found with ID: {}", todoId);
+                    return new ResourceNotFoundException(String.format("Todo not found with ID: %s", todoId));
                 });
-        Project project = todo.getProject();
-        if (!project.getUser().getUsername().equals(username)) {
-            String errorMsg = "User: " + username + " is not authorized to update this Todo with ID: " + todoId;
-            logger.error(errorMsg);
-            throw new UnauthorizedAccessException(errorMsg);
-        }
+
+        validateTodoBelongsToProject(todo, projectId);
+        checkUserAuthorization(todo.getProject(), username);
+
         todo.setDescription(todoRequestDTO.getDescription());
         todo.setStatus(todoRequestDTO.getStatus());
+
         Todo updatedTodo = todoRepository.save(todo);
         logger.info("Todo with ID: {} updated successfully", todoId);
+
         return mapToTodoResponseDTO(updatedTodo);
     }
 
     @Override
+    @Transactional
     public void deleteTodoFromProject(UUID todoId, UUID projectId, String username) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> {
-                    String errorMsg = "Project not found with ID: " + projectId;
-                    logger.error(errorMsg);
-                    return new ResourceNotFoundException(errorMsg);
+                    logger.error("Project not found with ID: {}", projectId);
+                    return new ResourceNotFoundException(String.format("Project not found with ID: %s", projectId));
                 });
 
-        if (!project.getUser().getUsername().equals(username)) {
-            String errorMsg = "User: " + username + " is not authorized to delete Todo from project with ID: " + projectId;
-            logger.error(errorMsg);
-            throw new UnauthorizedAccessException(errorMsg);
-        }
+        checkUserAuthorization(project, username);
 
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> {
-                    String errorMsg = "Todo not found with ID: " + todoId;
-                    logger.error(errorMsg);
-                    return new ResourceNotFoundException(errorMsg);
+                    logger.error("Todo not found with ID: {}", todoId);
+                    return new ResourceNotFoundException(String.format("Todo not found with ID: %s", todoId));
                 });
 
-        if (!todo.getProject().getId().equals(projectId)) {
-            String errorMsg = "Todo with ID: " + todoId + " does not belong to project with ID: " + projectId;
-            logger.error(errorMsg);
-            throw new ResourceNotFoundException(errorMsg);
-        }
+        validateTodoBelongsToProject(todo, projectId);
 
         todoRepository.delete(todo);
-
         logger.info("Todo with ID: {} deleted from project ID: {}", todoId, projectId);
     }
 
-
-
-    private TodoResponseDTO mapToTodoResponseDTO(Todo todo) {
-        logger.debug("Mapping Project entity to ProjectResponseDTO for project ID: {}", todo.getId());
-        return modelMapper.map(todo, TodoResponseDTO.class);
+    private void validateTodoBelongsToProject(Todo todo, UUID projectId) {
+        if (!todo.getProject().getId().equals(projectId)) {
+            String errorMsg = String.format("Todo with ID: %s does not belong to project with ID: %s",
+                    todo.getId(), projectId);
+            logger.error(errorMsg);
+            throw new ResourceNotFoundException(errorMsg);
+        }
     }
 
+    private void checkUserAuthorization(Project project, String username) {
+        if (!project.getUser().getUsername().equals(username)) {
+            String errorMsg = String.format("User: %s is not authorized to access this project with ID: %s",
+                    username, project.getId());
+            logger.error(errorMsg);
+            throw new UnauthorizedAccessException(errorMsg);
+        }
+    }
+
+    private TodoResponseDTO mapToTodoResponseDTO(Todo todo) {
+        logger.debug("Mapping Todo entity to TodoResponseDTO for todo ID: {}", todo.getId());
+        return modelMapper.map(todo, TodoResponseDTO.class);
+    }
 }

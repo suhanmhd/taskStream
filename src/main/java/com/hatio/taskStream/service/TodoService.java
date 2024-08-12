@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TodoService {
-    TodoResponseDTO addTodo(TodoRequestDTO todoRequestDTO);
+    TodoResponseDTO createTodo(TodoRequestDTO todoRequestDTO);
 
     List<TodoResponseDTO> getTodosByProject(UUID projectId, String username);
 
