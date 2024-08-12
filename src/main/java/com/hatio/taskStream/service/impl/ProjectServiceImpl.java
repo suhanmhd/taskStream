@@ -5,13 +5,13 @@ import com.hatio.taskStream.auth.repositories.UserRepository;
 import com.hatio.taskStream.auth.services.JwtService;
 import com.hatio.taskStream.dto.ProjectRequestDTO;
 import com.hatio.taskStream.dto.ProjectResponseDTO;
-import com.hatio.taskStream.enums.TodoStatus;
 import com.hatio.taskStream.exception.ResourceCreationException;
 import com.hatio.taskStream.exception.ResourceNotFoundException;
 import com.hatio.taskStream.exception.UnauthorizedAccessException;
 import com.hatio.taskStream.model.Project;
 
 import com.hatio.taskStream.repository.ProjectRepository;
+import com.hatio.taskStream.service.GitHubAuthTokenService;
 import com.hatio.taskStream.service.GitHubGistService;
 import com.hatio.taskStream.service.MarkdownService;
 import com.hatio.taskStream.service.ProjectService;
@@ -37,9 +37,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ModelMapper modelMapper;
     private final GitHubGistService gitHubGistService;
     private final MarkdownService markdownService;
+    private  final GitHubAuthTokenService gitHubAuthTokenService;
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
-    @Value("${github.client-id}")
+     @Value("${github.client-id}")
     private String clientId;
 
     @Value("${github.client-secret}")
@@ -47,14 +47,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Value("${github.redirect-uri}")
     private String redirectUri;
+    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Override
-    public ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO, String authHeader) {
+    public ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO, String userEmail) {
         logger.info("Creating project for request: {}", projectRequestDTO);
 
-        String token = authHeader.substring(7);
-        String userEmail = jwtService.extractUsername(token);
-        logger.debug("Extracted user email: {}", userEmail);
 
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> {
@@ -188,7 +186,7 @@ public class ProjectServiceImpl implements ProjectService {
         String gitToken = project.getUser().getGithubToken();
         if (gitToken == null) {
             logger.warn("GitHub token is missing for user with project ID: {}. Redirecting to authorization.", projectId);
-            return "REDIRECT:" + buildGitHubAuthorizationUrl();
+            return "REDIRECT:" + gitHubAuthTokenService.buildGitHubAuthorizationUrl();
         }
 
 
@@ -198,12 +196,6 @@ public class ProjectServiceImpl implements ProjectService {
         return gistUrl;
     }
 
-    private String buildGitHubAuthorizationUrl() {
-        String state = SecurityContextHolder.getContext().getAuthentication().getName();
-        String authorizeUrl = "https://github.com/login/oauth/authorize?client_id=" + clientId +
-                "&redirect_uri=" + redirectUri + "&scope=gist&state=" + state;
-        return authorizeUrl;
-    }
     private ProjectResponseDTO mapToProjectResponseDTO(Project project) {
         return modelMapper.map(project, ProjectResponseDTO.class);
     }

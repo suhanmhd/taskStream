@@ -29,8 +29,8 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<ProjectResponseDTO> createProject(@RequestBody ProjectRequestDTO projectRequestDTO,
-                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
-        ProjectResponseDTO response = projectService.createProject(projectRequestDTO, authHeader);
+                                                            @AuthenticationPrincipal UserDetails userDetails) {
+        ProjectResponseDTO response = projectService.createProject(projectRequestDTO,userDetails.getUsername());
         logger.info("Project created with ID: {}", response.getId());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

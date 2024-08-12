@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProjectService {
-    ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO, String authHeader);
+    ProjectResponseDTO createProject(ProjectRequestDTO projectRequestDTO, String username);
 
     List<ProjectResponseDTO> getAllProjectsByUser(String username);
 

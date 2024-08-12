@@ -2,7 +2,6 @@ package com.hatio.taskStream.auth.config;
 
 
 import com.hatio.taskStream.auth.services.AuthFilterService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +22,12 @@ public class SecurityConfiguration {
 
     private final AuthFilterService authFilterService;
     private final AuthenticationProvider authenticationProvider;
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Autowired
-    SecurityConfiguration (AuthFilterService authFilterService,AuthenticationProvider authenticationProvider,CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+    SecurityConfiguration (AuthFilterService authFilterService,AuthenticationProvider authenticationProvider) {
         this.authenticationProvider = authenticationProvider;
         this.authFilterService =authFilterService;
-        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+
     }
 
     @Bean
@@ -52,10 +51,8 @@ public class SecurityConfiguration {
                         .authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authenticationProvider(authenticationProvider)
                 .authenticationProvider(authenticationProvider)
-                .exceptionHandling(customizer -> customizer
-                        .authenticationEntryPoint(customAuthenticationEntryPoint))
+
 
                 .addFilterBefore(authFilterService, UsernamePasswordAuthenticationFilter.class);
 

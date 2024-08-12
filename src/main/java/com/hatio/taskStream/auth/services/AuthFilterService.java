@@ -1,6 +1,9 @@
 package com.hatio.taskStream.auth.services;
 
 
+import com.hatio.taskStream.exception.UnauthorizedAccessException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.SignatureException;
 
+//
 @Service
 public class AuthFilterService extends OncePerRequestFilter {
 
@@ -28,7 +33,55 @@ public class AuthFilterService extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-
+    //
+//    @Override
+//    protected void doFilterInternal(@NonNull HttpServletRequest request,
+//                                    @NonNull HttpServletResponse response,
+//                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+//
+//        final String authHeader = request.getHeader("Authorization");
+//        String jwt;
+//        String username;
+//
+//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.setContentType("application/json");
+//            response.getWriter().write("{\"error\": \"Unauthorized - Authentication token is missing or invalid.\"}");
+//            response.getWriter().flush();
+////            filterChain.doFilter(request, response);
+//            return;
+//        }
+//
+//        // extract JWT
+//        jwt = authHeader.substring(7);
+//
+//        // extract username from JWT
+//        username = jwtService.extractUsername(jwt);
+//
+//        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//
+//            if(jwtService.isTokenValid(jwt, userDetails)) {
+//                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+//                  userDetails,
+//                  null,
+//                  userDetails.getAuthorities()
+//                );
+//
+//                authenticationToken.setDetails(
+//                        new WebAuthenticationDetailsSource().buildDetails(request)
+//                );
+//
+//                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+//            }
+//            else {
+//                throw new UnauthorizedAccessException("Unauthorized - Authentication token is invalid.");
+//            }
+//        }
+//
+//        filterChain.doFilter(request, response);
+//    }
+//}
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -39,32 +92,44 @@ public class AuthFilterService extends OncePerRequestFilter {
         String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized - Authentication token is missing or invalid.\"}");
+            response.getWriter().flush();
             return;
         }
 
-        // extract JWT
         jwt = authHeader.substring(7);
 
-        // extract username from JWT
-        username = jwtService.extractUsername(jwt);
+        try {
+            username = jwtService.extractUsername(jwt);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if(jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                  userDetails,
-                  null,
-                  userDetails.getAuthorities()
-                );
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
-                authenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                    authenticationToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
+
+
+        } catch (Exception e) {
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized - Authentication failed.\"}");
+            response.getWriter().flush();
+            return;
         }
 
         filterChain.doFilter(request, response);
