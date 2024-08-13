@@ -58,19 +58,16 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
    ```bash
    git clone https://github.com/suhanmhd/TaskStream.git
 ``
-   <details>
-  <summary>2. Configure the database</summary>
+2. ** Configure the database**
+
   Edit `src/main/resources/application.properties` to configure your MySQL database.
-</details>
-<details>
-  <summary>3. Build the project</summary>
+3. ** Build the project**  
+ 
   ```bash
   mvn clean install
   ```
-</details>
-<details>
-  <summary>4. Run the application</summary>
+
+4.** Run the application**
   ```bash
   mvn spring-boot:run
   ```
-</details>
