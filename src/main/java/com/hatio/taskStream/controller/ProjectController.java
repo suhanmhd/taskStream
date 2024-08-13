@@ -36,6 +36,11 @@ public class ProjectController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @GetMapping("/home")
+    public ResponseEntity<String> sampleTestApi(){
+
+     return  new ResponseEntity<>("welcome to  taskstream",HttpStatus.OK);
+    }
     @GetMapping
     public List<ProjectResponseDTO> getAllProjectsByUser(@AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
