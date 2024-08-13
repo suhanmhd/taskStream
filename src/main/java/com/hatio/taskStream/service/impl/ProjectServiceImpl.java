@@ -198,6 +198,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         try {
             decryptedToken = EncryptionUtil.decrypt(gitToken);
+            System.out.println(decryptedToken+"ddd");
         } catch (Exception e) {
             logger.error("Error decrypting GitHub token for project ID: {}", projectId, e);
             throw new RuntimeException("Failed to decrypt GitHub token for user associated with project ID: " + projectId, e);
