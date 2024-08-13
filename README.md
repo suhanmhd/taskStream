@@ -55,13 +55,13 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
 
 1. **Clone the repository**
 
- ```
-  git clone https://github.com/suhanmhd/taskStream.git
- ```
+   ```
+   git clone https://github.com/suhanmhd/taskStream.git
+   ```
   
 
 2. **Configure the database**
-    Edit src/main/resources/application.properties to configure your MySQL database.You need to set the following properties:
+    Edit` src/main/resources/application`.properties to configure your MySQL database  You need to set the following properties:
     ```
    spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
    spring.datasource.username=your_database_username
@@ -75,14 +75,14 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
    ```
  
 5. **Run the application**
-  ```
-  mvn spring-boot:run
-  ```
+   ```
+   mvn spring-boot:run
+   ```
 5. **Docker Configuration**
-  ```
- docker build -t task-stream .
- docker run -p 9090:9090 task-stream
- ```
+   ```
+   docker build -t task-stream .
+   docker run -p 9090:9090 task-stream
+   ```
 
 ## Exporting Project Reports
 
