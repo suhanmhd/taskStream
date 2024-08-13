@@ -88,6 +88,20 @@ The TaskStream application allows for exporting project summaries as GitHub gist
 1. **Project Title**
    ```markdown
    # <Project title>
+## Summary
+- **Completed Todos:** <No. of completed todos>
+- **Total Todos:** <No. of total todos>
+### Pending Todos
+- [ ] Todo 1
+- [ ] Todo 2
+- [ ] Todo 3
+### Pending Todos
+- [ ] Todo 1
+- [ ] Todo 2
+- [ ] Todo 3
+  
+     
+   
 ## API Endpoints
 For detailed API documentation, please refer to the Swagger documentation linked below.
 
