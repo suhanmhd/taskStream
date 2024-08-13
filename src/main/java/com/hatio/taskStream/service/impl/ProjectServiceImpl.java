@@ -194,7 +194,7 @@ public class ProjectServiceImpl implements ProjectService {
             decryptedToken = EncryptionUtil.decrypt(gitToken);
         } catch (Exception e) {
             logger.error("Error decrypting GitHub token for project ID: {}", projectId, e);
-            throw new ResourceCreationException("Failed to decrypt GitHub token for user associated with project ID: " + projectId, e);
+            throw new RuntimeException("Failed to decrypt GitHub token for user associated with project ID: " + projectId, e);
         }
 
         if (decryptedToken.isEmpty()) {
@@ -208,7 +208,7 @@ public class ProjectServiceImpl implements ProjectService {
             gistUrl = gitHubGistService.createSecretGist(project.getTitle(), markdownSummary, decryptedToken);
         } catch (Exception e) {
             logger.error("Error creating gist for project ID: {}", projectId, e);
-            throw new ResourceCreationException("Failed to create gist for project ID: " + projectId, e);
+            throw new RuntimeException("Failed to create gist for project ID: " + projectId, e);
         }
 
         logger.info("Project summary exported as gist. URL: {}", gistUrl);
