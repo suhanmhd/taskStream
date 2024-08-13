@@ -92,11 +92,6 @@ public class AuthFilterService extends OncePerRequestFilter {
         String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Unauthorized - Authentication token is missing or invalid.\"}");
-            response.getWriter().flush();
-
             filterChain.doFilter(request, response);
 
             return;
