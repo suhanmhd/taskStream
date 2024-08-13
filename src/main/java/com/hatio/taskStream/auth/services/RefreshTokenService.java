@@ -2,8 +2,8 @@ package com.hatio.taskStream.auth.services;
 
 
 
-import com.hatio.taskStream.auth.entities.RefreshToken;
-import com.hatio.taskStream.auth.entities.User;
+import com.hatio.taskStream.auth.model.RefreshToken;
+import com.hatio.taskStream.auth.model.User;
 import com.hatio.taskStream.auth.repositories.RefreshTokenRepository;
 import com.hatio.taskStream.auth.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

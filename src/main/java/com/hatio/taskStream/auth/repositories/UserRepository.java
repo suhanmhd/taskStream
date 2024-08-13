@@ -2,11 +2,8 @@ package com.hatio.taskStream.auth.repositories;
 
 
 
-import com.hatio.taskStream.auth.entities.User;
-import jakarta.transaction.Transactional;
+import com.hatio.taskStream.auth.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 

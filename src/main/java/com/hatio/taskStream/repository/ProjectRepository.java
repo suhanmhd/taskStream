@@ -1,6 +1,6 @@
 package com.hatio.taskStream.repository;
 
-import com.hatio.taskStream.auth.entities.User;
+import com.hatio.taskStream.auth.model.User;
 import com.hatio.taskStream.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

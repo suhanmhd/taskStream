@@ -1,4 +1,4 @@
-package com.hatio.taskStream.auth.entities;
+package com.hatio.taskStream.auth.model;
 
 
 import com.hatio.taskStream.enums.UserRole;

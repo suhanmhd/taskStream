@@ -2,7 +2,7 @@ package com.hatio.taskStream.auth.services;
 
 
 
-import com.hatio.taskStream.auth.entities.User;
+import com.hatio.taskStream.auth.model.User;
 import com.hatio.taskStream.auth.repositories.UserRepository;
 import com.hatio.taskStream.auth.utils.AuthResponse;
 import com.hatio.taskStream.auth.utils.LoginRequest;

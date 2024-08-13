@@ -1,11 +1,12 @@
 package com.hatio.taskStream.model;
 
-import com.hatio.taskStream.auth.entities.User;
+import com.hatio.taskStream.auth.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,8 @@ public class Project {
     private UUID id;
 
     private String title;
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdDate;
 
     @OneToMany(mappedBy="project",cascade=CascadeType.ALL)

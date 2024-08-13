@@ -1,8 +1,8 @@
 package com.hatio.taskStream.auth.controller;
 
 
-import com.hatio.taskStream.auth.entities.RefreshToken;
-import com.hatio.taskStream.auth.entities.User;
+import com.hatio.taskStream.auth.model.RefreshToken;
+import com.hatio.taskStream.auth.model.User;
 import com.hatio.taskStream.auth.services.AuthService;
 import com.hatio.taskStream.auth.services.JwtService;
 import com.hatio.taskStream.auth.services.RefreshTokenService;

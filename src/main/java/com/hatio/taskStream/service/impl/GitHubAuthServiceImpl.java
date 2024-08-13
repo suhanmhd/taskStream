@@ -1,7 +1,7 @@
 package com.hatio.taskStream.service.impl;
 
 
-import com.hatio.taskStream.auth.entities.User;
+import com.hatio.taskStream.auth.model.User;
 import com.hatio.taskStream.auth.repositories.UserRepository;
 import com.hatio.taskStream.config.EncryptionUtil;
 import com.hatio.taskStream.service.GitHubAuthTokenService;

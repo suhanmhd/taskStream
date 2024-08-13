@@ -1,6 +1,6 @@
 package com.hatio.taskStream.service.impl;
 
-import com.hatio.taskStream.auth.entities.User;
+import com.hatio.taskStream.auth.model.User;
 import com.hatio.taskStream.auth.repositories.UserRepository;
 import com.hatio.taskStream.auth.services.JwtService;
 import com.hatio.taskStream.config.EncryptionUtil;
@@ -40,14 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final MarkdownService markdownService;
     private  final GitHubAuthTokenService gitHubAuthTokenService;
 
-     @Value("${github.client-id}")
-    private String clientId;
 
-    @Value("${github.client-secret}")
-    private String clientSecret;
-
-    @Value("${github.redirect-uri}")
-    private String redirectUri;
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Override
