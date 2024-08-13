@@ -87,7 +87,7 @@ The TaskStream application allows for exporting project summaries as GitHub gist
 ### Content
 1. **Project Title**
    ```markdown
-   # <Project title>
+    ## <Project title>
 ## Summary
 - **Completed Todos:** <No. of completed todos>
 - **Total Todos:** <No. of total todos>
