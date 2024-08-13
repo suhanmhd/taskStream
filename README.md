@@ -61,16 +61,23 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
   
 
 2. **Configure the database**
-    Edit src/main/resources/application.properties to configure your MySQL database.
+    Edit src/main/resources/application.properties to configure your MySQL database.You need to set the following properties:
+    ```
+   spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
+   spring.datasource.username=your_database_username
+   spring.datasource.password=your_database_password
+
+   `````
    
-3. **Build the project**
+4. **Build the project**
    ```
    mvn clean install
+   ```
  
-4. **Run the application**
+5. **Run the application**
   ```
   mvn spring-boot:run
-  `````
+  ```
 5. **Docker Configuration**
   ```
  docker build -t task-stream .
