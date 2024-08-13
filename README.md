@@ -55,9 +55,9 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
 
 1. **Clone the repository**
 
-   ```
-    git clone https://github.com/suhanmhd/taskStream.git
-   
+ ```
+  git clone https://github.com/suhanmhd/taskStream.git
+ ```
   
 
 2. **Configure the database**
@@ -68,14 +68,14 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
    mvn clean install
  
 4. **Run the application**
-```
+  ```
   mvn spring-boot:run
-`````
+  `````
 5. **Docker Configuration**
-```
-  docker build -t edu-manage .
- docker run -p 9090:9090 edu-manage
-```
+  ```
+ docker build -t task-stream .
+ docker run -p 9090:9090 task-stream
+ ```
 
 ## API Endpoints
 For detailed API documentation, please refer to the Swagger documentation linked below.
