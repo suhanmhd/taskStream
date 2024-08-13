@@ -48,7 +48,8 @@ public class GitHubAuthServiceImpl implements GitHubAuthTokenService {
 
         try {
             String accessToken = getGitHubAccessToken(code);
-            String encryptedToken = EncryptionUtil.encrypt(accessToken);
+            System.out.println(accessToken);
+//            String encryptedToken = EncryptionUtil.encrypt(accessToken);
 
 
             User user = userRepository.findByEmail(username)
@@ -57,7 +58,7 @@ public class GitHubAuthServiceImpl implements GitHubAuthTokenService {
                         return new UsernameNotFoundException("User not found with username: " + username);
                     });
 
-            user.setGithubToken(encryptedToken);
+            user.setGithubToken(accessToken);
             userRepository.save(user);
         } catch (Exception e) {
             logger.error("Error encrypting GitHub token: {}", e.getMessage());
