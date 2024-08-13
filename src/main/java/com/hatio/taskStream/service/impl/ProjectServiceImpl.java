@@ -192,7 +192,7 @@ public class ProjectServiceImpl implements ProjectService {
         String decryptedToken;
 
 
-        if (gitToken.isEmpty()) {
+        if (gitToken==null) {
             logger.warn("GitHub token is missing for user with project ID: {}. Redirecting to authorization.", projectId);
             return "REDIRECT:" + gitHubAuthTokenService.buildGitHubAuthorizationUrl();
         }
