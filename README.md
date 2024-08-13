@@ -117,7 +117,7 @@ The API endpoints are documented using Swagger ui. You can access the Swagger UI
 
 [https://edu.mediconnects.online/swagger-ui/index.html](https://taskstream.mediconnects.online/swagger-ui/index.html#/)
 
-## Project Demo
+## Project Demo Video
 
 Here are some video demos of the TaskStream project:
 
