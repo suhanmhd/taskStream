@@ -3,6 +3,7 @@ package com.hatio.taskStream.service.impl;
 
 import com.hatio.taskStream.auth.entities.User;
 import com.hatio.taskStream.auth.repositories.UserRepository;
+import com.hatio.taskStream.config.EncryptionUtil;
 import com.hatio.taskStream.service.GitHubAuthTokenService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -43,18 +44,25 @@ public class GitHubAuthServiceImpl implements GitHubAuthTokenService {
 
 
     @Override
-    public void processGitHubCallback(String code, String state) {
+    public void processGitHubCallback(String code, String username) {
 
-        String accessToken = getGitHubAccessToken(code);
-        String username = state;
-        User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> {
-                    logger.error("User not found with username: {}", username);
-                    return new UsernameNotFoundException("User not found with username: " + username);
-                });
-        user.setGithubToken(accessToken);
-        userRepository.save(user);
+        try {
+            String accessToken = getGitHubAccessToken(code);
+            String encryptedToken = EncryptionUtil.encrypt(accessToken);
 
+
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> {
+                        logger.error("User not found with username: {}", username);
+                        return new UsernameNotFoundException("User not found with username: " + username);
+                    });
+
+            user.setGithubToken(encryptedToken);
+            userRepository.save(user);
+        } catch (Exception e) {
+            logger.error("Error encrypting GitHub token: {}", e.getMessage());
+            throw new RuntimeException("Error processing GitHub callback", e);
+        }
     }
 
     public String getGitHubAccessToken(String authorizationCode) {

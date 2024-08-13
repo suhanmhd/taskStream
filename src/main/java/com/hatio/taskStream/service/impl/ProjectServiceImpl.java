@@ -3,6 +3,7 @@ package com.hatio.taskStream.service.impl;
 import com.hatio.taskStream.auth.entities.User;
 import com.hatio.taskStream.auth.repositories.UserRepository;
 import com.hatio.taskStream.auth.services.JwtService;
+import com.hatio.taskStream.config.EncryptionUtil;
 import com.hatio.taskStream.dto.ProjectRequestDTO;
 import com.hatio.taskStream.dto.ProjectResponseDTO;
 import com.hatio.taskStream.exception.ResourceCreationException;
@@ -37,9 +38,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ModelMapper modelMapper;
     private final GitHubGistService gitHubGistService;
     private final MarkdownService markdownService;
-    private  final GitHubAuthTokenService gitHubAuthTokenService;
+    private final GitHubAuthTokenService gitHubAuthTokenService;
 
-     @Value("${github.client-id}")
+    @Value("${github.client-id}")
     private String clientId;
 
     @Value("${github.client-secret}")
@@ -176,27 +177,42 @@ public class ProjectServiceImpl implements ProjectService {
     public String exportProjectSummaryAsGist(UUID projectId) {
         logger.info("Exporting project summary as gist for project ID: {}", projectId);
 
+        // Retrieve the project and handle the case where it is not found
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> {
                     logger.error("Project not found with ID: {}", projectId);
                     return new ResourceNotFoundException("Project not found with ID: " + projectId);
                 });
 
+        // Generate the markdown summary
         String markdownSummary = markdownService.generateMarkdownSummary(project);
+
+        // Decrypt the GitHub token and handle any issues during decryption
         String gitToken = project.getUser().getGithubToken();
-        if (gitToken == null) {
+        String decryptedToken;
+        try {
+            decryptedToken = EncryptionUtil.decrypt(gitToken);
+        } catch (Exception e) {
+            logger.error("Error decrypting GitHub token for project ID: {}", projectId, e);
+            throw new RuntimeException("Failed to decrypt GitHub token for user associated with project ID: " + projectId, e);
+        }
+
+
+        if (decryptedToken.isEmpty()) {
             logger.warn("GitHub token is missing for user with project ID: {}. Redirecting to authorization.", projectId);
             return "REDIRECT:" + gitHubAuthTokenService.buildGitHubAuthorizationUrl();
         }
 
-
-        String gistUrl = gitHubGistService.createSecretGist(project.getTitle(), markdownSummary,gitToken);
+        // Create the secret gist using the decrypted token
+        String gistUrl;
+        try {
+            gistUrl = gitHubGistService.createSecretGist(project.getTitle(), markdownSummary, decryptedToken);
+        } catch (Exception e) {
+            logger.error("Error creating gist for project ID: {}", projectId, e);
+            throw new ResourceCreationException("Failed to create gist for project ID: " + projectId, e);
+        }
 
         logger.info("Project summary exported as gist. URL: {}", gistUrl);
         return gistUrl;
-    }
-
-    private ProjectResponseDTO mapToProjectResponseDTO(Project project) {
-        return modelMapper.map(project, ProjectResponseDTO.class);
     }
 }
