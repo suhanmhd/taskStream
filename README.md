@@ -55,20 +55,35 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
 
 1. **Clone the repository**
 
-   ```bash
-    git clone [https://github.com/suhanmhd/TaskStream.git](https://github.com/suhanmhd/TaskStream.git)
    ```
-2. ** Configure the database**
-
-  Edit `src/main/resources/application.properties` to configure your MySQL database.
+    git clone https://github.com/suhanmhd/taskStream.git
+   
   
-3. ** Build the project**  
- 
-  ```bash
-  mvn clean install
-  ```
 
-4. ** Run the application**
-  ```bash
+2. **Configure the database**
+    Edit src/main/resources/application.properties to configure your MySQL database.
+   
+3. **Build the project**
+   ```
+   mvn clean install
+ 
+4. **Run the application**
+```
   mvn spring-boot:run
-  ```
+`````
+5. **Docker Configuration**
+```
+  docker build -t edu-manage .
+ docker run -p 9090:9090 edu-manage
+```
+
+## API Endpoints
+For detailed API documentation, please refer to the Swagger documentation linked below.
+
+## Swagger Collection
+The API endpoints are documented using Swagger ui. You can access the Swagger UI at:
+
+[https://edu.mediconnects.online/swagger-ui/index.html](https://taskstream.mediconnects.online/swagger-ui/index.html#/)
+  
+
+
