@@ -189,6 +189,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
         String gitToken = project.getUser().getGithubToken();
+        System.out.println(gitToken);
         String decryptedToken;
 
 
