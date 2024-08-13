@@ -190,18 +190,18 @@ public class ProjectServiceImpl implements ProjectService {
 
         String gitToken = project.getUser().getGithubToken();
         String decryptedToken;
+
+
+        if (gitToken.isEmpty()) {
+            logger.warn("GitHub token is missing for user with project ID: {}. Redirecting to authorization.", projectId);
+            return "REDIRECT:" + gitHubAuthTokenService.buildGitHubAuthorizationUrl();
+        }
         try {
             decryptedToken = EncryptionUtil.decrypt(gitToken);
         } catch (Exception e) {
             logger.error("Error decrypting GitHub token for project ID: {}", projectId, e);
             throw new RuntimeException("Failed to decrypt GitHub token for user associated with project ID: " + projectId, e);
         }
-
-        if (decryptedToken.isEmpty()) {
-            logger.warn("GitHub token is missing for user with project ID: {}. Redirecting to authorization.", projectId);
-            return "REDIRECT:" + gitHubAuthTokenService.buildGitHubAuthorizationUrl();
-        }
-
 
         String gistUrl;
         try {
