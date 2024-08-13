@@ -10,10 +10,10 @@ TaskStream is a backend-only Task Management System developed using Spring Boot.
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
 - [Database Schema](#database-schema)
-- [API Endpoints](#api-endpoints)
 - [Exporting Project Reports](#exporting-project-reports)
 - [Docker Configuration](#docker-configuration)
 - [CI/CD Pipeline](#cicd-pipeline)
+- [API Endpoints](#api-endpoints)
 - [License](#license)
 
 ## Introduction
@@ -99,9 +99,10 @@ The TaskStream application allows for exporting project summaries as GitHub gist
 - [ ] Todo 2
 - [ ] Todo 3
   
-     
-   
-## API Endpoints
+## CI/CD Pipeline
+The application uses Jenkins for continuous integration and continuous deployment. The pipeline automates the build and deployment process, ensuring that changes are tested and deployed efficiently.
+
+ ## API Endpoints
 For detailed API documentation, please refer to the Swagger documentation linked below.
 
 ## Swagger Collection
