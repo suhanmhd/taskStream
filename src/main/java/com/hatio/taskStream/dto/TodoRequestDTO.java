@@ -15,9 +15,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class TodoRequestDTO {
-    @NotBlank(message = "task description is mandatory")
+    @NotNull(message = "task description is mandatory")
     private String description;
-    @NotBlank(message = "Todo status is mandatory : (PENDING or COMPLETED)")
+    @NotNull(message = "Todo status is mandatory : (PENDING or COMPLETED)")
     private TodoStatus status;
     @NotNull(message = "ProjectID is mandatory")
     private UUID projectId;
