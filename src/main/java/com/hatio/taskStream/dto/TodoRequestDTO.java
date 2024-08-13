@@ -1,7 +1,8 @@
 package com.hatio.taskStream.dto;
 
 import com.hatio.taskStream.enums.TodoStatus;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +14,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class TodoRequestDTO {
-    @NotNull
+    @NotBlank(message = "task description is mandatory")
     private String description;
-    @NotNull
+    @NotBlank(message = "Todo status is mandatory : (PENDING or COMPLETED)")
     private TodoStatus status;
-    @NotNull
+    @NotBlank(message = "ProjectID is mandatory")
     private UUID projectId;
 }

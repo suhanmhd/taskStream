@@ -4,6 +4,7 @@ import com.hatio.taskStream.dto.ProjectRequestDTO;
 import com.hatio.taskStream.dto.ProjectResponseDTO;
 import com.hatio.taskStream.dto.TokenDTO;
 import com.hatio.taskStream.service.ProjectService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class ProjectController {
 
 
     @PostMapping
-    public ResponseEntity<ProjectResponseDTO> createProject(@RequestBody ProjectRequestDTO projectRequestDTO,
+    public ResponseEntity<ProjectResponseDTO> createProject(@Valid@ RequestBody ProjectRequestDTO projectRequestDTO,
                                                             @AuthenticationPrincipal UserDetails userDetails) {
         ProjectResponseDTO response = projectService.createProject(projectRequestDTO,userDetails.getUsername());
         logger.info("Project created with ID: {}", response.getId());
@@ -51,7 +52,7 @@ public class ProjectController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProjectResponseDTO> updateProjectById(@PathVariable UUID id,
-                                                                @RequestBody ProjectRequestDTO projectRequestDTO,
+                                                                @Valid  @RequestBody ProjectRequestDTO projectRequestDTO,
                                                                 @AuthenticationPrincipal UserDetails userDetails) {
         logger.info("User: {} requested update for project with ID: {}", userDetails.getUsername(), id);
         ProjectResponseDTO updatedProject = projectService.updateProjectById(id, projectRequestDTO, userDetails.getUsername());

@@ -42,7 +42,7 @@ public class TodoController {
     @PutMapping("/{todoId}")
     public ResponseEntity<TodoResponseDTO> updateTodo(@PathVariable UUID projectId,
                                                       @PathVariable UUID todoId,
-                                                      @RequestBody TodoRequestDTO todoRequestDTO,
+                                                      @Valid @RequestBody TodoRequestDTO todoRequestDTO,
                                                       @AuthenticationPrincipal UserDetails userDetails) {
         logger.info("User: {} requested update for todo ID: {} in project ID: {}",
                 userDetails.getUsername(), todoId, projectId);
