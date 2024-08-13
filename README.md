@@ -116,6 +116,14 @@ For detailed API documentation, please refer to the Swagger documentation linked
 The API endpoints are documented using Swagger ui. You can access the Swagger UI at:
 
 [https://edu.mediconnects.online/swagger-ui/index.html](https://taskstream.mediconnects.online/swagger-ui/index.html#/)
+
+## Project Demo
+
+Here are some video demos of the TaskStream project:
+
+- [CI/CD Pipeline in Action With docker and EC2 ](https://youtu.be/5kKli__mNHM)
+- [Project Overview](https://youtu.be/2K2_FHLEW3o)
+
   
 
 
