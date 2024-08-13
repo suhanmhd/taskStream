@@ -57,10 +57,11 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
 
    ```bash
    git clone https://github.com/suhanmhd/TaskStream.git
-``
+   ```
 2. ** Configure the database**
 
   Edit `src/main/resources/application.properties` to configure your MySQL database.
+  
 3. ** Build the project**  
  
   ```bash
