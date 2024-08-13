@@ -77,6 +77,17 @@ TaskStream is designed to manage tasks within projects efficiently. It provides 
  docker run -p 9090:9090 task-stream
  ```
 
+## Exporting Project Reports
+
+The TaskStream application allows for exporting project summaries as GitHub gists. The exported gist includes:
+
+### File Name
+`<Project title>.md`
+
+### Content
+1. **Project Title**
+   ```markdown
+   # <Project title>
 ## API Endpoints
 For detailed API documentation, please refer to the Swagger documentation linked below.
 
